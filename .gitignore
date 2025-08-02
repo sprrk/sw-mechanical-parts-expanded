@@ -1,4 +1,7 @@
 **.blend*
 **.mesh
 **.env
-**.bak*
+**.bak
+**.bin
+**.kate-swp
+build/

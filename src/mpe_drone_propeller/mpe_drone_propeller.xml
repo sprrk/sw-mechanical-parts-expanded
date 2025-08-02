@@ -1,9 +1,9 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<definition name="Drone Propeller" category="3" type="2" mass="1" value="50" flags="1073741825" tags="MPE,mod,rotor,drone" audio_filename_loop="src/mpe_drone_propeller/mpe_drone_propeller.ogg" audio_gain="0.5" mesh_0_name="src/mpe_drone_propeller/mpe_drone_propeller.mesh" mesh_1_name="src/mpe_drone_propeller/mpe_drone_propeller_blade.mesh" mesh_editor_only_name="src/mpe_drone_propeller/mpe_drone_propeller_arrow.mesh" cable_length="16" seat_health_per_sec="1" buoy_radius="1" buoy_factor="1" buoy_force="100" force_emitter_max_force="400" force_emitter_max_vector="1" force_emitter_default_pitch="1" force_emitter_blade_physics_length="0.15" force_emitter_blade_efficiency="0.0075" force_emitter_rotation_speed="6" force_emitter_blade_height="0.0" force_emitter_efficiency="1" engine_max_force="400" max_motor_force="0" max_motor_speed="5" rudder_surface_area="0">
+<definition name="Drone Propeller" category="3" type="2" mass="1" value="50" flags="1073741825" tags="MPE,mod,rotor,drone" audio_filename_loop="mpe_drone_propeller.ogg" audio_gain="0.5" mesh_0_name="mpe_drone_propeller.mesh" mesh_1_name="mpe_drone_propeller_blade.mesh" mesh_editor_only_name="mpe_drone_propeller_arrow.mesh" cable_length="16" seat_health_per_sec="1" buoy_radius="1" buoy_factor="1" buoy_force="100" force_emitter_max_force="400" force_emitter_max_vector="1" force_emitter_default_pitch="1" force_emitter_blade_physics_length="0.15" force_emitter_blade_efficiency="0.0075" force_emitter_rotation_speed="6" force_emitter_blade_height="0.0" force_emitter_efficiency="1" engine_max_force="400" max_motor_force="0" max_motor_speed="5" rudder_surface_area="0">
 	<sfx_datas>
 		<sfx_data sfx_name="force_emitter" sfx_range_inner="2.0" sfx_range_outer="25.0" sfx_priority="1.0" sfx_is_underwater_affected="true">
 			<sfx_layers>
-				<sfx_layer sfx_filename_start="" sfx_filename_loop="src/mpe_drone_propeller/mpe_drone_propeller.ogg" sfx_filename_end="" sfx_gain="0.5" sfx_loop_start_time="0.0" sfx_loop_blend_duration="1" sfx_volume_fade_speed="1" sfx_pitch_fade_speed="1"/>
+				<sfx_layer sfx_filename_start="" sfx_filename_loop="mpe_drone_propeller.ogg" sfx_filename_end="" sfx_gain="0.5" sfx_loop_start_time="0.0" sfx_loop_blend_duration="1" sfx_volume_fade_speed="1" sfx_pitch_fade_speed="1"/>
 			</sfx_layers>
 		</sfx_data>
 	</sfx_datas>
