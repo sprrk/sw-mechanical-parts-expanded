@@ -30,7 +30,19 @@
 		<logic_node orientation="5" label="Driveshaft B" type="2">
 			<position/>
 		</logic_node>
-		<logic_node label="Slip Factor" mode="1" type="1" description="Slip limit value between 0 (locked) and 1 (open).">
+    <logic_node label="Settings" mode="1" type="5" description="Number input values:
+1: Slip limit [0=locked..1=open]
+2: Drive ratio [TBD..TBD]
+3: Responsiveness [0..1]
+4: RPS sync factor [0..inf]
+5: Left-right bias [-1..1]
+6: Base mass [0..inf]">
+			<position/>
+		</logic_node>
+    <logic_node label="Data Output" mode="0" type="5" description="Composite data output:
+1: Driveshaft RPS.
+2: Left axle RPS.
+3: Right axle RPS.">
 			<position/>
 		</logic_node>
 	</logic_nodes>
