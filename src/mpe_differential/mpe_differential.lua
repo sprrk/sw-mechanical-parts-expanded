@@ -62,7 +62,7 @@ function onTick()
 	if composite_ok then
 		local floats = composite.float_values
 		SLIP_FACTOR = clamp(floats[1], 0, 1)
-		--DRIVE_RATIO = floats[2] or 1 -- TODO: Clamp to sane limits
+		DRIVE_RATIO = clamp(floats[2] or 1, 0.1, 10)
 		MASS_SMOOTHING_FACTOR = clamp(floats[3], 0, 1)
 		SLIP_MASS_FACTOR = math.max(floats[4], 0)
 		LR_BIAS = clamp(floats[5], -1, 1) -- TODO: Implement bias for torque vectoring
@@ -88,13 +88,13 @@ function onTick()
 	if driveshaft_a_connected then
 		driveshaft_rps = component.slotTorqueApplyMomentum(
 			DRIVESHAFT_A,
-			BASE_MASS + AXLE_A_MASS + AXLE_B_MASS,
+			(BASE_MASS + AXLE_A_MASS + AXLE_B_MASS) / DRIVE_RATIO,
 			driveshaft_target_rps
 		)
 	elseif driveshaft_b_connected then
 		driveshaft_rps = component.slotTorqueApplyMomentum(
 			DRIVESHAFT_B,
-			BASE_MASS + AXLE_A_MASS + AXLE_B_MASS,
+			(BASE_MASS + AXLE_A_MASS + AXLE_B_MASS) / DRIVE_RATIO,
 			driveshaft_target_rps
 		)
 	end
@@ -106,8 +106,10 @@ function onTick()
 	local axle_b_target_rps = axle_b_rps + accel
 
 	-- Apply axle momentum
-	local rps_a = component.slotTorqueApplyMomentum(AXLE_A, BASE_MASS + DRIVESHAFT_MASS, axle_a_target_rps)
-	local rps_b = component.slotTorqueApplyMomentum(AXLE_B, BASE_MASS + DRIVESHAFT_MASS, axle_b_target_rps)
+	local rps_a =
+		component.slotTorqueApplyMomentum(AXLE_A, (BASE_MASS + DRIVESHAFT_MASS) * DRIVE_RATIO, axle_a_target_rps)
+	local rps_b =
+		component.slotTorqueApplyMomentum(AXLE_B, (BASE_MASS + DRIVESHAFT_MASS) * DRIVE_RATIO, axle_b_target_rps)
 
 	local slip_magnitude_driveshaft = math.abs(driveshaft_target_rps - driveshaft_rps)
 	local calculated_driveshaft_mass = slip_magnitude_driveshaft * SLIP_MASS_FACTOR
