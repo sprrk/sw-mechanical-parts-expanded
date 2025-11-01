@@ -15,6 +15,24 @@
 		<surface orientation="5" shape="3" trans_type="1">
 			<position/>
 		</surface>
+		<surface orientation="2" shape="0">
+			<position/>
+		</surface>
+		<surface orientation="3" shape="0">
+			<position/>
+		</surface>
+		<surface orientation="2" shape="0">
+			<position z="1"/>
+		</surface>
+		<surface orientation="3" shape="0">
+			<position z="1"/>
+		</surface>
+		<surface orientation="0" shape="0">
+			<position z="1"/>
+		</surface>
+		<surface orientation="1" shape="0">
+			<position z="1"/>
+		</surface>
 	</surfaces>
 	<buoyancy_surfaces/>
 	<logic_nodes>
