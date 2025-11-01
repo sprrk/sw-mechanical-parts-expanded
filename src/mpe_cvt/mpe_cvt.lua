@@ -1,6 +1,6 @@
 local RATIO_MIN = 0.1
 local RATIO_MAX = 10
-local LOSS = 0.15
+local LOSS = 0.07
 
 local init = false
 
