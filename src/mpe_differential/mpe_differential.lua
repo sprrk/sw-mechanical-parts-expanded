@@ -100,8 +100,8 @@ function onTick()
 		INERTIA_RESPONSIVENESS = clamp(floats[7] or 0.95, 0, 1)
 		RPS_SLIP_ENGAGEMENT_FACTOR = math.max(floats[8] or 1, 0)
 		BASE_INERTIA = math.max(floats[9], 0)
-		ACCEL_MAGNITUDE_THRESHOLD = math.max(floats[10] or 0.02, 0)
-		BRAKE_MAGNITUDE_THRESHOLD = math.max(floats[11] or 0.2, 0)
+		ACCEL_MAGNITUDE_THRESHOLD = math.max(floats[10] or 0.02, 0.0001)
+		BRAKE_MAGNITUDE_THRESHOLD = math.max(floats[11] or 0.2, 0.0001)
 	end
 
 	local driveshaft_a_connected = component.slotTorqueIsConnected(DRIVESHAFT_A)
