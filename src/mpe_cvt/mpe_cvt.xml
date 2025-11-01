@@ -39,10 +39,10 @@ Max. ratio: 10"/>
 	</surfaces>
 	<buoyancy_surfaces/>
 	<logic_nodes>
-		<logic_node orientation="5" label="RPS A" mode="1" type="2" description="Power connection A.">
+		<logic_node orientation="5" label="RPS A" mode="1" type="2">
 			<position/>
 		</logic_node>
-		<logic_node orientation="4" label="RPS B" mode="1" type="2" description="Power connection B.">
+		<logic_node orientation="4" label="RPS B" mode="1" type="2">
 			<position x="-1"/>
 		</logic_node>
 		<logic_node label="Gear Ratio" mode="1" type="1" description="The gear ratio. [0.1 .. 10]">
@@ -51,11 +51,11 @@ Max. ratio: 10"/>
 	</logic_nodes>
 	<couplings/>
 	<voxels>
-		<voxel flags="1" buoy_pipes="63">
+		<voxel flags="1">
 			<position/>
 			<physics_shape_rotation/>
 		</voxel>
-		<voxel flags="1" buoy_pipes="63">
+		<voxel flags="1">
 			<position x="-1"/>
 			<physics_shape_rotation/>
 		</voxel>
