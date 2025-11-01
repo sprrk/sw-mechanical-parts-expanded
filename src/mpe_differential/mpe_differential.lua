@@ -91,16 +91,40 @@ function onTick()
 	local composite, composite_ok = component.getInputLogicSlotComposite(SETTINGS_SLOT)
 	if composite_ok then
 		local floats = composite.float_values
+		-- Max locking factor while accelerating (0 = open, 1 = fully locked)
 		LSD_ACCELERATION_LOCK = clamp(floats[1], 0, 1)
+
+		-- Max locking factor while decelerating (braking / engine-braking)
 		LSD_BRAKING_LOCK = clamp(floats[2], 0, 1)
+
+		-- Minimum locking factor that is always present
 		LSD_PRELOAD_LOCK = clamp(floats[3], 0, 1)
+
+		-- How fast the lock factor follows acceleration changes (0 = sluggish, 1 = instant)
 		LSD_RESPONSIVENESS = clamp(floats[4] or 0.1, 0, 1)
+
+		-- Torque split: -1 = 100% to axle A, 0 = 50/50, +1 = 100% to axle B
 		TORQUE_BIAS = clamp(floats[5], -1, 1)
+
+		-- Gear ratio
 		DRIVE_RATIO = clamp(floats[6] or 1, 0.1, 10)
+
+		-- How fast the coupling increases/decreases (0 = sluggish, 1 = instant)
 		INERTIA_RESPONSIVENESS = clamp(floats[7] or 0.95, 0, 1)
+
+		-- How strongly speed difference increases coupling (viscous element):
+		-- low values allow large RPS differences between the driveshaft and axles (like a slippy clutch),
+		-- high values keep the driveshaft and axle RPS in sync but result in more friction.
+		-- Use a low value when using a weak engine, and a high value when using a strong engine.
 		RPS_SLIP_ENGAGEMENT_FACTOR = math.max(floats[8] or 1, 0)
+
+		-- Base inertia / coupling strength
 		BASE_INERTIA = math.max(floats[9], 0)
+
+		-- Driveshaft RPS change needed to reach full accel-lock
 		ACCEL_MAGNITUDE_THRESHOLD = math.max(floats[10] or 0.02, 0.0001)
+
+		-- Driveshaft RPS change needed to reach full braking-lock
 		BRAKE_MAGNITUDE_THRESHOLD = math.max(floats[11] or 0.2, 0.0001)
 	end
 
