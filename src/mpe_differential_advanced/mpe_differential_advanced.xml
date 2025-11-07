@@ -1,0 +1,125 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<definition name="Differential (Advanced)" category="2" type="66" mass="5" value="200" flags="16384" tags="MPE,mod" mesh_data_name="mpe_differential_advanced.mesh" constraint_axis="1" max_motor_force="100" max_motor_speed="10" cable_radius="16" cable_length="-431602080" buoy_radius="1" buoy_factor="1" buoy_force="100" force_emitter_max_force="200" force_emitter_max_vector="1" engine_max_force="1000" wheel_radius="0.25" button_type="1" light_intensity="1" light_range="1" light_ies_map="graphics/ies/ies_default.txtr" light_fov="1" door_lower_limit="-1" door_upper_limit="1" dynamic_max_rotation="3.141593" magnet_force="1" pump_pressure="0.01" torque_component_type="1" lua_filename="mpe_differential_advanced.lua">
+  <tooltip_properties short_description="A limited-slip differential that allows two wheels to rotate at different speeds.
+
+Note: Because the modding API does not give us editable component properties, this component must be configured via the 'Settings' composite input slot. A compatible microcontroller is available; check the Workshop page of this mod for a link."/>
+	<sfx_datas/>
+	<surfaces>
+		<surface orientation="1" shape="3" trans_type="1">
+			<position/>
+		</surface>
+		<surface shape="3" trans_type="1">
+			<position/>
+		</surface>
+		<surface orientation="4" shape="3" trans_type="1">
+			<position z="1"/>
+		</surface>
+		<surface orientation="5" shape="3" trans_type="1">
+			<position/>
+		</surface>
+		<surface orientation="2" shape="0">
+			<position/>
+		</surface>
+		<surface orientation="3" shape="0">
+			<position/>
+		</surface>
+		<surface orientation="2" shape="0">
+			<position z="1"/>
+		</surface>
+		<surface orientation="3" shape="0">
+			<position z="1"/>
+		</surface>
+		<surface orientation="0" shape="0">
+			<position z="1"/>
+		</surface>
+		<surface orientation="1" shape="0">
+			<position z="1"/>
+		</surface>
+	</surfaces>
+	<buoyancy_surfaces/>
+	<logic_nodes>
+		<logic_node orientation="1" label="Axle A" type="2">
+			<position/>
+		</logic_node>
+		<logic_node orientation="0" label="Axle B" type="2">
+			<position/>
+		</logic_node>
+		<logic_node orientation="4" label="Driveshaft A" type="2">
+			<position z="1"/>
+		</logic_node>
+		<logic_node orientation="5" label="Driveshaft B" type="2">
+			<position/>
+		</logic_node>
+    <logic_node label="Settings" mode="1" type="5" description="Number input values:
+1: LSD acceleration lock [0..1]
+2: LSD braking lock [0..1]
+3: LSD preload lock [0..1]
+4: LSD responsiveness [0..1]
+5: Torque bias [-1..1]
+6: Drive ratio [0.1..10]
+7: Inertia responsiv. [0..1]
+8: RPS slip engagement [0..inf]
+9: Base inertia [0..inf]
+10: Accel threshold [0..inf]
+11: Decel threshold [0..inf]">
+			<position/>
+		</logic_node>
+    <logic_node label="Data Output" mode="0" type="5" description="Composite data output:
+1: Driveshaft RPS
+2: Left axle RPS
+3: Right axle RPS
+4: Accel magnitude [0..1]
+5: Braking magnitude [0..1]
+6: Current lock factor [0..1]">
+			<position z="1"/>
+		</logic_node>
+	</logic_nodes>
+	<couplings/>
+	<voxels>
+		<voxel flags="1">
+			<position/>
+			<physics_shape_rotation/>
+		</voxel>
+		<voxel flags="1">
+			<position z="1"/>
+			<physics_shape_rotation/>
+		</voxel>
+	</voxels>
+	<voxel_min/>
+	<voxel_max/>
+	<voxel_physics_min/>
+	<voxel_physics_max/>
+	<bb_physics_min/>
+	<bb_physics_max/>
+	<compartment_sample_pos/>
+	<constraint_pos_parent/>
+	<constraint_pos_child/>
+	<voxel_location_child/>
+	<seat_offset/>
+	<seat_front/>
+	<seat_up/>
+	<seat_camera/>
+	<seat_render/>
+	<force_dir/>
+	<light_position/>
+	<light_color x="1" y="1" z="1"/>
+	<light_forward/>
+	<door_size x="1" y="1" z="1"/>
+	<door_normal/>
+	<door_side/>
+	<door_up/>
+	<door_base_pos/>
+	<dynamic_body_position/>
+	<dynamic_rotation_axes y="1"/>
+	<dynamic_side_axis x="1"/>
+	<magnet_offset/>
+	<connector_axis/>
+	<connector_up/>
+	<jet_engine_connections_prev/>
+	<jet_engine_connections_next/>
+	<particle_direction/>
+	<particle_offset/>
+	<particle_bounds/>
+	<rope_hook_offset/>
+</definition>
+
