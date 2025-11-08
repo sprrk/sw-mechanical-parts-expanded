@@ -51,5 +51,6 @@
     "filter_after_early_return",
     "rename_variables",
     "remove_empty_do",
+    "remove_types"
   ],
 }
