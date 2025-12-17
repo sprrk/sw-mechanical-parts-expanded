@@ -75,6 +75,14 @@ local function init()
 	AXLE_A_MASS, AXLE_B_MASS, DS_MASS, initialized = calibrateMass()
 end
 
+function onParse()
+	initialized, _ = parser.parseBool("initialized", initialized)
+	axle_bridge, _ = parser.parseBool("axle_bridge", axle_bridge)
+	AXLE_A_MASS, _ = parser.parseNumber("axle_a_mass", AXLE_A_MASS)
+	AXLE_B_MASS, _ = parser.parseNumber("axle_b_mass", AXLE_B_MASS)
+	DS_MASS, _ = parser.parseNumber("ds_mass", DS_MASS)
+end
+
 function onTick()
 	if not initialized then
 		init()
