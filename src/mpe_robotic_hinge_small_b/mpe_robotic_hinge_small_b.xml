@@ -1,0 +1,94 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<definition name="Small Robotic Hinge" category="2" type="7" mass="1" flags="384" mesh_data_name="mpe_robotic_hinge_small_b.mesh" constraint_axis="2" max_motor_force="1000" cable_length="16" buoy_radius="1" buoy_factor="1" buoy_force="100" force_emitter_max_force="1000" force_emitter_max_vector="1" engine_max_force="1000" wheel_radius="0.25" button_type="1" light_range="1" light_ies_map="graphics/ies/ies_default.txtr" light_fov="1" door_lower_limit="-1" door_upper_limit="1" dynamic_max_rotation="3.141593" magnet_force="1" rudder_surface_area="0">
+	<tooltip_properties/>
+	<sfx_datas/>
+	<surfaces>
+		<surface orientation="2" shape="3" trans_type="1">
+			<position/>
+		</surface>
+		<surface orientation="3">
+			<position/>
+		</surface>
+		<surface orientation="5">
+			<position/>
+		</surface>
+		<surface orientation="1">
+			<position/>
+		</surface>
+		<surface orientation="4">
+			<position/>
+		</surface>
+		<surface>
+			<position/>
+		</surface>
+	</surfaces>
+	<buoyancy_surfaces>
+		<surface orientation="1" shape="1">
+			<position/>
+		</surface>
+		<surface orientation="2" shape="1">
+			<position/>
+		</surface>
+		<surface shape="1">
+			<position/>
+		</surface>
+		<surface orientation="3" shape="1">
+			<position/>
+		</surface>
+		<surface orientation="5" shape="1">
+			<position/>
+		</surface>
+		<surface orientation="4" shape="1">
+			<position/>
+		</surface>
+	</buoyancy_surfaces>
+	<logic_nodes>
+		<logic_node orientation="2" label="RPS" mode="1" type="2" description="Power connection for transfering mechanical energy.">
+			<position/>
+		</logic_node>
+	</logic_nodes>
+	<couplings/>
+	<voxels>
+		<voxel flags="4" physics_shape="0">
+			<position/>
+			<physics_shape_rotation/>
+		</voxel>
+	</voxels>
+	<voxel_min/>
+	<voxel_max/>
+	<voxel_physics_min/>
+	<voxel_physics_max/>
+	<bb_physics_min/>
+	<bb_physics_max/>
+	<compartment_sample_pos/>
+	<constraint_pos_parent y="0.25"/>
+	<constraint_pos_child y="-0.25"/>
+	<voxel_location_child y="2"/>
+	<seat_offset/>
+	<seat_front/>
+	<seat_up/>
+	<seat_camera/>
+	<seat_render/>
+	<force_dir/>
+	<light_position/>
+	<light_color x="1" y="1" z="1"/>
+	<light_forward/>
+	<door_size x="1" y="1" z="1"/>
+	<door_normal/>
+	<door_side/>
+	<door_up/>
+	<door_base_pos/>
+	<dynamic_body_position/>
+	<dynamic_rotation_axes y="1"/>
+	<dynamic_side_axis x="1"/>
+	<magnet_offset/>
+	<connector_axis/>
+	<connector_up/>
+	<jet_engine_connections_prev/>
+	<jet_engine_connections_next/>
+	<particle_direction/>
+	<particle_offset/>
+	<particle_bounds/>
+	<rope_hook_offset/>
+</definition>
+

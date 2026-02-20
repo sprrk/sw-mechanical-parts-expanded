@@ -1,0 +1,106 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<definition name="Servo" category="2" type="7" mass="1" value="150" flags="320" tags="MPE,mod" audio_filename_loop="audio/fx3/stormworks_hingepivot1_loop.ogg" audio_gain="1" mesh_data_name="mpe_servo_a.mesh" mesh_editor_only_name="meshes/arrow_robotic_pivot.mesh" child_name="mpe_servo_b" constraint_axis="1" constraint_range_of_motion="0.995" max_motor_force="1000" buoy_radius="1" buoy_factor="1" buoy_force="100" force_emitter_max_force="800" force_emitter_max_vector="1" engine_max_force="1000" wheel_radius="0.25" button_type="1" light_intensity="1" light_range="1" light_ies_map="graphics/ies/ies_default.txtr" light_fov="1" door_lower_limit="-1" door_upper_limit="1" magnet_force="1">
+	<tooltip_properties description="A servo that can transfer RPS and can rotate 180 degrees in both directions. Be careful when nearing 180 degrees; if the servo overshoots, it will glitch out and do a full rotation."/>
+	<sfx_datas>
+		<sfx_data sfx_name="multibody" sfx_range_inner="2" sfx_priority="0.2">
+			<sfx_layers>
+				<sfx_layer sfx_filename_loop="audio/fx3/stormworks_hingepivot1_loop.ogg" sfx_volume_fade_speed="0.008" sfx_pitch_fade_speed="0.008"/>
+			</sfx_layers>
+		</sfx_data>
+	</sfx_datas>
+	<surfaces>
+		<surface orientation="3" shape="3" trans_type="1">
+			<position/>
+		</surface>
+		<surface orientation="5">
+			<position/>
+		</surface>
+		<surface>
+			<position/>
+		</surface>
+		<surface orientation="4">
+			<position/>
+		</surface>
+		<surface orientation="1">
+			<position/>
+		</surface>
+		<surface orientation="2">
+			<position/>
+		</surface>
+	</surfaces>
+	<buoyancy_surfaces>
+		<surface orientation="3" shape="1">
+			<position/>
+		</surface>
+		<surface orientation="2" shape="1">
+			<position/>
+		</surface>
+		<surface orientation="5" shape="1">
+			<position/>
+		</surface>
+		<surface orientation="1" shape="1">
+			<position/>
+		</surface>
+		<surface orientation="4" shape="1">
+			<position/>
+		</surface>
+		<surface shape="1">
+			<position/>
+		</surface>
+	</buoyancy_surfaces>
+	<logic_nodes>
+		<logic_node label="Rotation Target" mode="1" type="1" description="The standard value setting the orientation within the range of motion.">
+			<position/>
+		</logic_node>
+		<logic_node label="Electric" mode="1" type="4" description="Electrical power connection.">
+			<position/>
+		</logic_node>
+		<logic_node orientation="3" label="RPS" mode="1" type="2" description="Power connection for transferring mechanical energy.">
+			<position/>
+		</logic_node>
+	</logic_nodes>
+	<couplings/>
+	<voxels>
+		<voxel flags="1">
+			<position/>
+			<physics_shape_rotation/>
+		</voxel>
+	</voxels>
+	<voxel_min/>
+	<voxel_max/>
+	<voxel_physics_min/>
+	<voxel_physics_max/>
+	<bb_physics_min/>
+	<bb_physics_max/>
+	<compartment_sample_pos/>
+	<constraint_pos_parent y="0.25"/>
+	<constraint_pos_child/>
+	<voxel_location_child y="1"/>
+	<seat_offset/>
+	<seat_front/>
+	<seat_up/>
+	<seat_camera/>
+	<seat_render/>
+	<force_dir/>
+	<light_position/>
+	<light_color x="1" y="1" z="1"/>
+	<light_forward/>
+	<door_size x="1" y="1" z="1"/>
+	<door_normal/>
+	<door_side/>
+	<door_up/>
+	<door_base_pos/>
+	<dynamic_body_position/>
+	<dynamic_rotation_axes y="1"/>
+	<dynamic_side_axis x="1"/>
+	<magnet_offset/>
+	<connector_axis/>
+	<connector_up/>
+	<jet_engine_connections_prev/>
+	<jet_engine_connections_next/>
+	<particle_direction/>
+	<particle_offset/>
+	<particle_bounds/>
+	<rope_hook_offset/>
+</definition>
+
