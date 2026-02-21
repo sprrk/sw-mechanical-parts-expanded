@@ -1,0 +1,94 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<definition name="Freewheel" category="2" type="66" mass="2" value="50" flags="16384" tags="MPE,mod" mesh_data_name="mpe_freewheel.mesh" constraint_axis="1" max_motor_force="100" max_motor_speed="10" cable_radius="16" buoy_radius="1" buoy_factor="1" buoy_force="100" force_emitter_max_force="2000" force_emitter_max_vector="1" engine_max_force="1000" wheel_radius="0.25" button_type="1" light_intensity="1" light_range="1" light_ies_map="graphics/ies/ies_default.txtr" light_fov="1" door_lower_limit="-1" door_upper_limit="1" dynamic_max_rotation="3.141593" magnet_force="1" pump_pressure="0.01" lua_filename="mpe_freewheel.lua">
+  <tooltip_properties description="A coupling that disengages when the output slot rotates faster than the input slot.
+
+This component can be configured via composite values:
+- Min. input RPS: Disengage when input RPS is below this value.
+- Deadzone: Increase to reduce jitter.
+- Gain: Increase to make the freewheel engage more quickly.
+- Responsiveness: Controls smoothness; lower=smoother, higher=faster."/>
+	<sfx_datas/>
+	<surfaces>
+		<surface orientation="5" shape="3" trans_type="1">
+			<position/>
+		</surface>
+		<surface orientation="4" shape="3" trans_type="1">
+			<position/>
+		</surface>
+		<surface orientation="3">
+			<position/>
+		</surface>
+		<surface orientation="2">
+			<position/>
+		</surface>
+		<surface orientation="1">
+			<position/>
+		</surface>
+		<surface orientation="0">
+			<position/>
+		</surface>
+	</surfaces>
+	<buoyancy_surfaces/>
+	<logic_nodes>
+		<logic_node orientation="5" label="Input" mode="1" type="2" description="Input power connection.">
+			<position/>
+		</logic_node>
+		<logic_node orientation="4" label="Output" mode="1" type="2" description="Output power connection.">
+			<position/>
+		</logic_node>
+    <logic_node label="Settings" mode="1" type="5" description="Number input values:
+1: Min. input RPS [0..inf]
+2: Deadzone [0..inf]
+3: Gain [0.01..inf]
+4: Responsiveness [0..1]">
+			<position/>
+		</logic_node>
+		<logic_node label="Lock Factor" type="1" description="The current lock factor.">
+			<position/>
+		</logic_node>
+	</logic_nodes>
+	<couplings/>
+	<voxels>
+		<voxel flags="1" buoy_pipes="63">
+			<position/>
+			<physics_shape_rotation/>
+		</voxel>
+	</voxels>
+	<voxel_min/>
+	<voxel_max/>
+	<voxel_physics_min/>
+	<voxel_physics_max/>
+	<bb_physics_min/>
+	<bb_physics_max/>
+	<compartment_sample_pos/>
+	<constraint_pos_parent/>
+	<constraint_pos_child/>
+	<voxel_location_child/>
+	<seat_offset/>
+	<seat_front/>
+	<seat_up/>
+	<seat_camera/>
+	<seat_render/>
+	<force_dir/>
+	<light_position/>
+	<light_color x="1" y="1" z="1"/>
+	<light_forward/>
+	<door_size x="1" y="1" z="1"/>
+	<door_normal/>
+	<door_side/>
+	<door_up/>
+	<door_base_pos/>
+	<dynamic_body_position/>
+	<dynamic_rotation_axes y="1"/>
+	<dynamic_side_axis x="1"/>
+	<magnet_offset/>
+	<connector_axis/>
+	<connector_up/>
+	<jet_engine_connections_prev/>
+	<jet_engine_connections_next/>
+	<particle_direction/>
+	<particle_offset/>
+	<particle_bounds/>
+	<rope_hook_offset/>
+</definition>
+

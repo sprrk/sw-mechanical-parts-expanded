@@ -25,6 +25,8 @@
         // for example, to support requires of Wally packages as `pkg/PackageName`,
         // map `pkg` to a path to the `Packages` folder created by Wally:
         pkg: "./Packages",
+        lib: "./src/lib",
+        "sw-lua-lib": "./third_party/sw-lua-lib",
       },
 
       // Enable or disable finding `.luaurc` files to load source aliases
