@@ -1,0 +1,78 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<definition name="Maglock 1x2 (Offset)" category="2" type="17" mass="1.000000" value="40" flags="0" tags="MPE,mod,magnet" audio_filename_start="audio/fx3/stormworks_pneumaticdoor_end.ogg" audio_filename_loop="" audio_filename_end="" audio_gain="0.6" mesh_data_name="mpe_maglock_1x2_offset.mesh" mesh_0_name="" mesh_1_name="" mesh_editor_only_name="" block_type="0" child_name="" extender_name="" constraint_type="0" constraint_axis="1" constraint_range_of_motion="0.000000" max_motor_force="100.000000" seat_type="0" buoy_radius="1.000000" buoy_factor="1.000000" buoy_force="100.000000" force_emitter_max_force="1000.000000" force_emitter_max_vector="1.000000" engine_max_force="1000.000000" trans_conn_type="0" trans_type="0" wheel_radius="0.250000" button_type="1" light_intensity="0.000000" light_range="1.000000" light_ies_map="graphics/ies/ies_default.txtr" light_fov="1.000000" light_type="0" door_lower_limit="-1.000000" door_upper_limit="1.000000" door_flipped="false" dynamic_min_rotation="0.000000" dynamic_max_rotation="3.141593" logic_gate_type="1" indicator_type="0" connector_type="2" magnet_force="0.01" gyro_type="0" rudder_surface_area="0.000000" electric_magnitude="0.1">
+  <tooltip_properties description="An electromagnetic connector that can be used to attach two physics bodies together.
+
+Note: This part does not have any physics."/>
+	<sfx_datas>
+		<sfx_data sfx_name="connector" sfx_range_inner="3.0" sfx_range_outer="30.0" sfx_priority="0.4" sfx_is_underwater_affected="true">
+			<sfx_layers>
+				<sfx_layer sfx_filename_start="audio/fx3/stormworks_pneumaticdoor_end.ogg" sfx_filename_loop="" sfx_filename_end="" sfx_gain="0.6" sfx_loop_start_time="0.75" sfx_loop_blend_duration="10.0" sfx_volume_fade_speed="1.0" sfx_pitch_fade_speed="1.0"/>
+			</sfx_layers>
+		</sfx_data>
+	</sfx_datas>
+	<surfaces>
+		<surface orientation="1">
+			<position x="0" y="0" z="1"/>
+		</surface>
+		<surface orientation="4">
+			<position x="0" y="0" z="1"/>
+		</surface>
+		<surface orientation="0">
+			<position x="0" y="0" z="1"/>
+		</surface>
+		<surface orientation="0">
+			<position x="0" y="0" z="0"/>
+		</surface>
+		<surface orientation="5">
+			<position x="0" y="0" z="0"/>
+		</surface>
+		<surface orientation="1">
+			<position x="0" y="0" z="0"/>
+		</surface>
+		<surface orientation="3">
+			<position x="0" y="0" z="0"/>
+		</surface>
+		<surface orientation="3">
+			<position x="0" y="0" z="1"/>
+		</surface>
+	</surfaces>
+  <buoyancy_surfaces/>
+	<logic_nodes>
+		<logic_node label="Magnet Toggle" mode="1" type="0" description="Enables the connector's magnet when receiving an on signal.">
+			<position x="0" y="0" z="0"/>
+		</logic_node>
+		<logic_node label="Connected" mode="0" type="0" description="Outputs an on signal if the connector is attached to another connector.">
+			<position x="0" y="0" z="1"/>
+		</logic_node>
+		<logic_node label="Electric" mode="1" type="4" description="Electrical power connection." flags="0">
+			<position x="0" y="0" z="0"/>
+		</logic_node>
+	</logic_nodes>
+	<voxels>
+		<voxel flags="4">
+			<position x="0" y="0" z="0"/>
+		</voxel>
+		<voxel flags="4">
+			<position x="0" y="0" z="1"/>
+		</voxel>
+	</voxels>
+	<voxel_min x="0" y="0" z="0"/>
+	<voxel_max x="0" y="0" z="1"/>
+	<voxel_physics_min x="0" y="0" z="0"/>
+	<voxel_physics_max x="0" y="0" z="1"/>
+	<bb_physics_min/>
+	<bb_physics_max/>
+	<constraint_pos_parent/>
+	<constraint_pos_child/>
+	<voxel_location_child/>
+	<force_dir/>
+	<light_position/>
+	<light_color x="1" y="1" z="1"/>
+	<door_size x="1" y="1" z="1"/>
+	<dynamic_body_position/>
+	<dynamic_rotation_axes x="0" y="1" z="0"/>
+	<dynamic_side_axis x="1" y="0" z="0"/>
+	<magnet_offset x="0.5" y="0.5" z="0.5"/>
+	<reward_properties tier="5" number_rewarded="4"/>
+</definition>
+
