@@ -20,7 +20,7 @@ local RESPONSIVENESS = pN("Responsiveness") * 0.001
 local CLUTCH_KEY = pN("Clutch key")
 
 local HUD_RADIUS = 5
-local CURSOR_SPEED = 2.5
+local CURSOR_SPEED = pN("HUD cursor speed")
 local HUD_X, HUD_Y = 200, 80 -- Offset
 
 -- Note: HUD size is x=256, y=192
