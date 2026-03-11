@@ -8,7 +8,6 @@ local iN = input.getNumber
 local iB = input.getBool
 local sN = output.setNumber
 local max = math.max
-local line = screen.drawLine
 local circleF = screen.drawCircleF
 
 local TARGET_RPS = pN("Target RPS")
@@ -153,12 +152,13 @@ local dim = ui.color(255, 255, 255, 64)
 local function Gear(x, y, label)
 	local r = HUD_RADIUS
 	local o = -r * 0.5 + 1
-	local p1 = Vec2(x, y)
+	local pos = Vec2(x, y)
 
 	---@class Gear
 	---@field x integer
 	---@field y integer
-	local instance = { x = x, y = y }
+	---@field pos Vec2
+	local instance = { x = x, y = y, pos = pos }
 
 	---@return RenderFunc[]
 	function instance:getRenderFuncs()
@@ -170,8 +170,8 @@ local function Gear(x, y, label)
 					dim()
 				end
 			end,
-			ui.circle(p1, r),
-			ui.text(p1:add(Vec2(o, o)), label),
+			ui.circle(pos, r),
+			ui.text(pos:add(Vec2(o, o)), label),
 			dim,
 		}
 	end
@@ -189,16 +189,17 @@ local function RangeSelector(x, y, label)
 	local base = Gear(x, y, label)
 
 	local r = HUD_RADIUS
-	local p1 = Vec2(x, y)
+	local pos = Vec2(x, y)
 
-	local pTop = p1:add(Vec2(0, -20))
-	local pBot = p1:add(Vec2(0, 20))
+	local pTop = pos:add(Vec2(0, -20))
+	local pBot = pos:add(Vec2(0, 20))
 	local tOffset = Vec2(r, -r * 0.5 + 1)
 
 	---@class RangeSelector : Gear
 	---@field x integer
 	---@field y integer
-	local instance = { x = x, y = y }
+	---@field pos Vec2
+	local instance = { x = x, y = y, pos = pos }
 
 	---@return RenderFunc[]
 	function instance:getRenderFuncs()
@@ -209,11 +210,11 @@ local function RangeSelector(x, y, label)
 			-- Top
 			ui.circleF(pTop, r * 0.5),
 			ui.text(pTop:add(tOffset), "+"),
-			ui.line(p1, pTop, { m1 = r + 1, m2 = r * 0.5 }),
+			ui.line(pos, pTop, { m1 = r + 1, m2 = r * 0.5 }),
 			-- Bottom
 			ui.circleF(pBot, r * 0.5),
 			ui.text(pBot:add(tOffset), "-"),
-			ui.line(p1, pBot, { m1 = r + 1, m2 = r * 0.5 }),
+			ui.line(pos, pBot, { m1 = r + 1, m2 = r * 0.5 }),
 		}
 
 		for i = 1, #selectorRenderFuncs do
@@ -234,36 +235,6 @@ local gears = {
 	M = RangeSelector(HUD_X + 20, HUD_Y + 60, "M"),
 }
 currentGear = gears.P -- Default to park
-
----@param gear1 Gear
----@param gear2 Gear
----@return RenderFunc
-local function makeGearLineFunc(gear1, gear2)
-	-- TODO: Use func provided by ui lib
-	local x1, y1, x2, y2 = gear1.x, gear1.y, gear2.x, gear2.y
-
-	local dx = x2 - x1
-	local dy = y2 - y1
-	local distance = math.sqrt(dx * dx + dy * dy)
-	local ux = dx / distance
-	local uy = dy / distance
-
-	local r = HUD_RADIUS
-	local startCutoff = 1
-	local endCutoff = 0
-	local l1 = r + startCutoff
-	local l2 = r + endCutoff
-
-	local x1Edge = x1 + ux * l1
-	local y1Edge = y1 + uy * l1
-	local x2Edge = x2 - ux * l2
-	local y2Edge = y2 - uy * l2
-
-	---@return nil
-	return function()
-		line(x1Edge, y1Edge, x2Edge, y2Edge)
-	end
-end
 
 ---@return Gear|nil
 local function findNearestGear()
@@ -383,10 +354,10 @@ end
 ---@type RenderFunc[]
 local renderFuncs = {
 	dim,
-	makeGearLineFunc(gears.P, gears.R),
-	makeGearLineFunc(gears.R, gears.N),
-	makeGearLineFunc(gears.N, gears.D),
-	makeGearLineFunc(gears.M, gears.D),
+	ui.line(gears.P.pos, gears.R.pos, { m1 = HUD_RADIUS + 1, m2 = HUD_RADIUS + 0 }),
+	ui.line(gears.R.pos, gears.N.pos, { m1 = HUD_RADIUS + 1, m2 = HUD_RADIUS + 0 }),
+	ui.line(gears.N.pos, gears.D.pos, { m1 = HUD_RADIUS + 1, m2 = HUD_RADIUS + 0 }),
+	ui.line(gears.M.pos, gears.D.pos, { m1 = HUD_RADIUS + 1, m2 = HUD_RADIUS + 0 }),
 }
 for _, gear in pairs(gears) do
 	local funcs = gear:getRenderFuncs()
