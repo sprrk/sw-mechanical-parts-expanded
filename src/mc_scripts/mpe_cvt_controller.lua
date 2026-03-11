@@ -2,22 +2,28 @@ local EMAFilter = require("sw-lua-lib/dsp/exponential_moving_average")
 local clamp = require("sw-lua-lib/extramath/clamp")
 local lerp = require("sw-lua-lib/extramath/lerp")
 local snap = require("sw-lua-lib/extramath/snap")
+local setState = require("sw-lua-lib/statemachine/mc_state")
 
 local pN = property.getNumber
 local iN = input.getNumber
 local iB = input.getBool
 local sN = output.setNumber
+local sB = output.setBool
 local max = math.max
 local circleF = screen.drawCircleF
 
-local TARGET_RPS = pN("Target RPS")
-local RPS_BAND = pN("RPS band")
 local RATIO_MIN = pN("Min. ratio")
 local RATIO_MAX = pN("Max. ratio")
-local MIN_RPS = TARGET_RPS - RPS_BAND
-local MAX_RPS = TARGET_RPS + RPS_BAND
+local MIN_RPS = pN("Idle RPS")
+local MAX_RPS = pN("Max. RPS")
 local RESPONSIVENESS = pN("Responsiveness") * 0.001
 local CLUTCH_KEY = pN("Clutch key")
+local RATIO_SELECTOR_MIN = pN("Min. selector ratio")
+local RATIO_SELECTOR_MAX = pN("Max. selector ratio")
+local RATIO_MULT_REVERSE = 0.1 -- TODO: Make configurable
+
+local THROTTLE_GAIN = 0.375 -- TODO: Make configurable
+local CLUTCH_GAIN = 2.0 -- TODO: Make configurable
 
 local HUD_RADIUS = 5
 local CURSOR_SPEED = pN("HUD cursor speed")
@@ -25,10 +31,11 @@ local HUD_X, HUD_Y = 200, 80 -- Offset
 
 -- Note: HUD size is x=256, y=192
 
-local smooth = EMAFilter({ alpha = RESPONSIVENESS })
+local smoothRatio = EMAFilter({ alpha = RESPONSIVENESS })
+local smoothClutch = EMAFilter({ alpha = 0.6 })
+local smoothThrottle = EMAFilter({ alpha = 0.6 })
 
 local cursorPos = { x = 0, y = 0 }
-local clutchKeyDown = false
 
 ---@alias RenderFunc fun(): nil
 
@@ -184,7 +191,7 @@ end
 ---@param label GearLabel
 ---@return RangeSelector
 local function RangeSelector(x, y, label)
-	-- TODO: Implement range selector logic
+	-- TODO: Implement range selector visualization
 
 	local base = Gear(x, y, label)
 
@@ -258,85 +265,6 @@ local function findNearestGear()
 	return gears[nearestGear]
 end
 
----@param gear Gear
----@return nil
-local function snapToGear(gear)
-	-- TODO: Snap more smoothly over a few frames instead of instantly
-	cursorPos.x = gear.x
-	cursorPos.y = gear.y
-	currentGear = gear
-end
-
----@param x number
----@param y number
----@return nil
-local function moveCursor(x, y)
-	local isMoving = (x ~= 0) or (y ~= 0)
-
-	local nearestGear = findNearestGear()
-
-	if isMoving and clutchKeyDown then
-		y = -y -- Flip Y, the HUD's Y axis is inverted
-
-		-- TODO: Prevent moving to next gear if X axis is not aligned, so that e.g.
-		--       when holding down and left, it snaps to the next gear instead of
-		--       skipping multiple gears
-
-		y = y * CURSOR_SPEED
-		x = x * CURSOR_SPEED
-
-		-- TODO: Improve cursor constraint calculation
-		if nearestGear == gears.P then
-			-- Only down
-			cursorPos.x = gears.P.x
-			if cursorPos.y < gears.P.y then
-				cursorPos.y = gears.P.y
-			end
-		elseif nearestGear == gears.R then
-			-- Only up and down
-			cursorPos.x = gears.R.x
-		elseif nearestGear == gears.N then
-			-- Only up and down
-			cursorPos.x = gears.N.x
-		elseif nearestGear == gears.D then
-			-- Up and left
-			if cursorPos.x > gears.D.x then
-				cursorPos.x = gears.D.x
-			end
-			if cursorPos.y > gears.D.y then
-				cursorPos.y = gears.D.y
-			end
-		elseif nearestGear == gears.M then
-			-- Up, down and right
-			if cursorPos.x < gears.M.x then
-				cursorPos.x = gears.M.x
-			end
-			--elseif nearestGear == gears.M_min then
-			--	-- TODO: Implement range selector:
-			--	--       - Stick cursor x to gears.M.x
-			--	--       - Prevent moving cursor y to less than gears.M_max.y and higher than gears.M_min.y
-			--	--       - Decrease cursor speed
-			--	--       - Only snap to gears.M if nearby enough
-			--	cursorPos.x = gears.M_min.x
-			--	if cursorPos.y > gears.M_min.y then
-			--		cursorPos.y = gears.M_min.y
-			--	end
-			--elseif nearestGear == gears.M_max then
-			--	cursorPos.x = gears.M_max.x
-			--	if cursorPos.y < gears.M_max.y then
-			--		cursorPos.y = gears.M_max.y
-			--	end
-		end
-
-		cursorPos.x = cursorPos.x + x
-		cursorPos.y = cursorPos.y + y
-	elseif not clutchKeyDown then
-		if nearestGear then
-			snapToGear(nearestGear)
-		end
-	end
-end
-
 ---@return nil
 local function drawCursor()
 	local r = HUD_RADIUS
@@ -373,16 +301,43 @@ function onDraw()
 	end
 end
 
-function onTick()
-	local leftRight = iN(3)
-	local upDown = iN(4)
-	clutchKeyDown = iB(CLUTCH_KEY)
-	if clutchKeyDown then
-		currentGear = nil
-	end
-	moveCursor(leftRight, upDown)
+-- Forward-declare all states so they can be referenced inside other states
+local StatePark, StateReverse, StateNeutral, StateDrive, StateManual, StateNavigate
 
-	local throttle = max(0, iN(2)) -- W/S value
+---@return nil
+local function handleClutchEngage()
+	-- Switch to the navigation state when the clutch key is pushed
+	if iB(CLUTCH_KEY) then
+		setState(StateNavigate)
+	end
+end
+
+---@param v number Clutch value [0..1]
+---@return nil
+local function setClutch(v)
+	sN(2, v)
+end
+
+---@param v number CVT ratio value
+---@return nil
+local function setRatio(v)
+	sN(1, v)
+end
+
+---@return nil
+local function updateThrottle()
+	local engineRPS = iN(5)
+	local userInput = clamp(iN(2), 0, 1) -- W/S value
+	local minThrottle = clamp((MIN_RPS - engineRPS) * THROTTLE_GAIN, 0, 1)
+	local maxThrottle = clamp((MAX_RPS - engineRPS) * THROTTLE_GAIN, 0, 1)
+	local throttle = clamp(userInput, minThrottle, maxThrottle)
+	sN(4, smoothThrottle(throttle))
+end
+
+---@param mult number Ratio multiplier
+---@return nil
+local function runCVT(mult)
+	local userInput = max(0, iN(2)) -- W/S value
 	local engineRPS = iN(5)
 	local driveshaftRPS = iN(6)
 	local clampedEngineRPS = clamp(engineRPS, MIN_RPS, MAX_RPS)
@@ -391,9 +346,182 @@ function onTick()
 	local engineRatio = RATIO_MIN + (clampedEngineRPS - MIN_RPS) * (RATIO_MAX - RATIO_MIN) / (MAX_RPS - MIN_RPS)
 	local driveshaftRatio = clampedDriveshaftRPS / MAX_RPS
 
-	local ratio = lerp(driveshaftRatio, engineRatio, throttle)
+	local ratio = lerp(driveshaftRatio, engineRatio, userInput)
+
+	ratio = ratio * mult
 
 	ratio = clamp(ratio, RATIO_MIN, RATIO_MAX)
-	ratio = smooth(ratio)
-	sN(1, ratio)
+	ratio = smoothRatio(ratio)
+
+	setRatio(ratio)
+end
+
+---@return nil
+local function autoClutch()
+	local engineRPS = iN(5)
+
+	local userInput = max(0, iN(2)) -- W/S value
+	local maxClutch = clamp((engineRPS - MIN_RPS) * CLUTCH_GAIN, 0, 1) -- Anti-stall
+	local clutch = clamp(userInput, 0, maxClutch)
+	sN(2, smoothClutch(clutch))
+end
+
+---@type MicrocontrollerState
+StateNavigate = (function()
+	return {
+		onEntry = function()
+			setClutch(0)
+			currentGear = nil
+		end,
+
+		onTick = function()
+			updateThrottle()
+
+			if iB(CLUTCH_KEY) then
+				-- As long as the clutch key is pressed, move the cursor
+
+				local x = iN(3) -- Left/right
+				local y = iN(4) -- Up/down
+				y = -y -- Flip Y, the HUD's Y axis is inverted
+
+				-- TODO: Prevent moving to next gear if X axis is not aligned, so that e.g.
+				--       when holding down and left, it snaps to the next gear instead of
+				--       skipping multiple gears
+
+				y = y * CURSOR_SPEED
+				x = x * CURSOR_SPEED
+
+				cursorPos.x = cursorPos.x + x
+				cursorPos.y = cursorPos.y + y
+			else
+				-- When the clutch key is released, then find the nearest gear,
+				-- activate it, and switch to that gear's state
+				local gear = findNearestGear()
+				if gear then
+					-- TODO: Snap more smoothly over a few frames instead of instantly
+					cursorPos.x = gear.x
+					cursorPos.y = gear.y
+					currentGear = gear
+
+					-- TODO: Use lookup table instead of if/else chain
+					if gear == gears.P then
+						setState(StatePark)
+					elseif gear == gears.R then
+						setState(StateReverse)
+					elseif gear == gears.N then
+						setState(StateNeutral)
+					elseif gear == gears.D then
+						setState(StateDrive)
+					elseif gear == gears.M then
+						setState(StateManual)
+					end
+				end
+			end
+		end,
+	}
+end)()
+
+---@type MicrocontrollerState
+StatePark = (function()
+	---@param v boolean
+	---@return nil
+	local function setPawl(v)
+		if v then
+			sN(3, 1)
+		else
+			sN(3, 0)
+		end
+	end
+
+	return {
+		onEntry = function()
+			setPawl(true)
+		end,
+
+		onTick = function()
+			updateThrottle()
+			handleClutchEngage()
+		end,
+
+		onExit = function()
+			setPawl(false)
+		end,
+	}
+end)()
+
+---@type MicrocontrollerState
+StateReverse = (function()
+	---@param v boolean
+	---@return nil
+	local function setReverse(v)
+		sB(1, v)
+	end
+
+	return {
+		onEntry = function()
+			setReverse(true)
+		end,
+
+		onTick = function()
+			updateThrottle()
+			runCVT(RATIO_MULT_REVERSE)
+			autoClutch()
+			handleClutchEngage()
+		end,
+
+		onExit = function()
+			setReverse(false)
+		end,
+	}
+end)()
+
+---@type MicrocontrollerState
+StateNeutral = (function()
+	return {
+		onEntry = function()
+			setClutch(0)
+		end,
+
+		onTick = function()
+			updateThrottle()
+			handleClutchEngage()
+		end,
+	}
+end)()
+
+---@type MicrocontrollerState
+StateDrive = (function()
+	return {
+		onTick = function()
+			updateThrottle()
+			runCVT(1)
+			autoClutch()
+			handleClutchEngage()
+		end,
+	}
+end)()
+
+---@type MicrocontrollerState
+StateManual = (function()
+	local ratio = RATIO_SELECTOR_MIN
+	local value = 0
+	local SPEED = 0.01
+
+	return {
+		onTick = function()
+			value = value + iN(4) * SPEED -- Up/down
+			value = clamp(value, 0, 1)
+			ratio = lerp(RATIO_SELECTOR_MIN, RATIO_SELECTOR_MAX, value)
+
+			setRatio(ratio)
+			autoClutch()
+			updateThrottle()
+			handleClutchEngage()
+		end,
+	}
+end)()
+
+function onTick()
+	-- Run for 1 tick for proper initialization, then activate state machine
+	setState(StatePark)
 end
