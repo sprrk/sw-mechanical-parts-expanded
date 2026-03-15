@@ -18,16 +18,28 @@ local MIN_RPS = pN("Idle RPS")
 local MAX_RPS = pN("Max. RPS")
 local RESPONSIVENESS = pN("Responsiveness") * 0.001
 local CLUTCH_KEY = pN("Clutch key")
-local RATIO_SELECTOR_MIN = pN("Min. selector ratio")
-local RATIO_SELECTOR_MAX = pN("Max. selector ratio")
 local RATIO_MULT_REVERSE = 0.1 -- TODO: Make configurable
+
+local MANUAL_GEAR_COUNT = pN("Manual gear count")
+local MANUAL_RATIOS = {
+	M1 = pN("M1 ratio"),
+	M2 = pN("M2 ratio"),
+	M3 = pN("M3 ratio"),
+	M4 = pN("M4 ratio"),
+	M5 = pN("M5 ratio"),
+	M6 = pN("M6 ratio"),
+	M7 = pN("M7 ratio"),
+	M8 = pN("M8 ratio"),
+}
+
+local DOWNSHIFT_OVERREV_MARGIN = 10
 
 local THROTTLE_GAIN = 0.375 -- TODO: Make configurable
 local CLUTCH_GAIN = 2.0 -- TODO: Make configurable
 
 local HUD_RADIUS = 5
 local CURSOR_SPEED = pN("HUD cursor speed")
-local HUD_X, HUD_Y = 200, 80 -- Offset
+local HUD_X, HUD_Y = 180, 80 -- Offset
 
 -- Note: HUD size is x=256, y=192
 
@@ -84,13 +96,14 @@ local ui = {
 
 	---@param p Vec2 Top-left position
 	---@param txt string
-	---@return RenderFunc
+	---@return RenderFunc renderFunc, (fun(t: string): nil) textUpdateFunc
 	text = function(p, txt)
-		local x, y, f = p.x, p.y, screen.drawText
+		local x, y, f, t = p.x, p.y, screen.drawText, txt
 
-		---@return nil
 		return function()
-			f(x, y, txt)
+			f(x, y, t)
+		end, function(_t)
+			t = _t
 		end
 	end,
 
@@ -165,7 +178,8 @@ local function Gear(x, y, label)
 	---@field x integer
 	---@field y integer
 	---@field pos Vec2
-	local instance = { x = x, y = y, pos = pos }
+	---@field label GearLabel
+	local instance = { x = x, y = y, pos = pos, label = label }
 
 	---@return RenderFunc[]
 	function instance:getRenderFuncs()
@@ -178,7 +192,7 @@ local function Gear(x, y, label)
 				end
 			end,
 			ui.circle(pos, r),
-			ui.text(pos:add(Vec2(o, o)), label),
+			ui.text(pos:add(Vec2(o, o)), string.sub(label, 1, 1)),
 			dim,
 		}
 	end
@@ -206,7 +220,8 @@ local function RangeSelector(x, y, label)
 	---@field x integer
 	---@field y integer
 	---@field pos Vec2
-	local instance = { x = x, y = y, pos = pos }
+	---@field label GearLabel
+	local instance = { x = x, y = y, pos = pos, label = label }
 
 	---@return RenderFunc[]
 	function instance:getRenderFuncs()
@@ -235,11 +250,11 @@ end
 
 ---@type table<GearLabel,Gear>
 local gears = {
-	P = Gear(HUD_X + 40, HUD_Y + 0, "P"),
-	R = Gear(HUD_X + 40, HUD_Y + 20, "R"),
-	N = Gear(HUD_X + 40, HUD_Y + 40, "N"),
-	D = Gear(HUD_X + 40, HUD_Y + 60, "D"),
-	M = RangeSelector(HUD_X + 20, HUD_Y + 60, "M"),
+	P = Gear(HUD_X + 40, HUD_Y + 0, "Park"),
+	R = Gear(HUD_X + 40, HUD_Y + 20, "Reverse"),
+	N = Gear(HUD_X + 40, HUD_Y + 40, "Neutral"),
+	D = Gear(HUD_X + 40, HUD_Y + 60, "Drive"),
+	M = RangeSelector(HUD_X + 20, HUD_Y + 60, "Manual"),
 }
 currentGear = gears.P -- Default to park
 
@@ -279,6 +294,9 @@ local function drawCursor()
 end
 
 -- Collect all renderables
+
+local renderGearLabel, updateGearLabel = ui.text(Vec2(50, 50), currentGear.label)
+
 ---@type RenderFunc[]
 local renderFuncs = {
 	dim,
@@ -286,6 +304,7 @@ local renderFuncs = {
 	ui.line(gears.R.pos, gears.N.pos, { m1 = HUD_RADIUS + 1, m2 = HUD_RADIUS + 0 }),
 	ui.line(gears.N.pos, gears.D.pos, { m1 = HUD_RADIUS + 1, m2 = HUD_RADIUS + 0 }),
 	ui.line(gears.M.pos, gears.D.pos, { m1 = HUD_RADIUS + 1, m2 = HUD_RADIUS + 0 }),
+	renderGearLabel,
 }
 for _, gear in pairs(gears) do
 	local funcs = gear:getRenderFuncs()
@@ -324,6 +343,12 @@ local function setRatio(v)
 	sN(1, v)
 end
 
+---@param v boolean
+---@return nil
+local function setReverse(v)
+	sB(1, v)
+end
+
 ---@return nil
 local function updateThrottle()
 	local engineRPS = iN(5)
@@ -334,9 +359,8 @@ local function updateThrottle()
 	sN(4, smoothThrottle(throttle))
 end
 
----@param mult number Ratio multiplier
----@return nil
-local function runCVT(mult)
+---@return number ratio
+local function determineRatio()
 	local userInput = max(0, iN(2)) -- W/S value
 	local engineRPS = iN(5)
 	local driveshaftRPS = iN(6)
@@ -347,6 +371,13 @@ local function runCVT(mult)
 	local driveshaftRatio = clampedDriveshaftRPS / MAX_RPS
 
 	local ratio = lerp(driveshaftRatio, engineRatio, userInput)
+	return clamp(ratio, RATIO_MIN, RATIO_MAX)
+end
+
+---@param mult number Ratio multiplier
+---@return nil
+local function runCVT(mult)
+	local ratio = determineRatio()
 
 	ratio = ratio * mult
 
@@ -372,6 +403,7 @@ StateNavigate = (function()
 		onEntry = function()
 			setClutch(0)
 			currentGear = nil
+			updateGearLabel("")
 		end,
 
 		onTick = function()
@@ -436,6 +468,7 @@ StatePark = (function()
 	return {
 		onEntry = function()
 			setPawl(true)
+			updateGearLabel(currentGear.label)
 		end,
 
 		onTick = function()
@@ -451,15 +484,10 @@ end)()
 
 ---@type MicrocontrollerState
 StateReverse = (function()
-	---@param v boolean
-	---@return nil
-	local function setReverse(v)
-		sB(1, v)
-	end
-
 	return {
 		onEntry = function()
 			setReverse(true)
+			updateGearLabel(currentGear.label)
 		end,
 
 		onTick = function()
@@ -480,6 +508,7 @@ StateNeutral = (function()
 	return {
 		onEntry = function()
 			setClutch(0)
+			updateGearLabel(currentGear.label)
 		end,
 
 		onTick = function()
@@ -492,6 +521,10 @@ end)()
 ---@type MicrocontrollerState
 StateDrive = (function()
 	return {
+		onEntry = function()
+			updateGearLabel(currentGear.label)
+		end,
+
 		onTick = function()
 			updateThrottle()
 			runCVT(1)
@@ -503,17 +536,82 @@ end)()
 
 ---@type MicrocontrollerState
 StateManual = (function()
-	local ratio = RATIO_SELECTOR_MIN
-	local value = 0
-	local SPEED = 0.01
+	local currentGearIndex = 1
+	local gearChanged = false
+	local targetRatio = MANUAL_RATIOS.M1
+	local smoothManualRatio = EMAFilter({ alpha = 0.03 })
+
+	---@return nil
+	local function updateGear()
+		local gearKey = "M" .. currentGearIndex
+		updateGearLabel("M" .. currentGearIndex)
+		targetRatio = MANUAL_RATIOS[gearKey] or 1.0
+	end
+
+	---@param expectedRatio number
+	---@return integer
+	local function findNearestManualGear(expectedRatio)
+		local closestIndex = 1
+		local minDifference = math.abs((MANUAL_RATIOS["M1"] or 1.0) - expectedRatio)
+
+		for i = 1, MANUAL_GEAR_COUNT do
+			local gearKey = "M" .. i
+			local gearRatio = MANUAL_RATIOS[gearKey] or 1.0
+			local difference = math.abs(gearRatio - expectedRatio)
+
+			if difference < minDifference then
+				minDifference = difference
+				closestIndex = i
+			end
+		end
+
+		return closestIndex
+	end
 
 	return {
-		onTick = function()
-			value = value + iN(4) * SPEED -- Up/down
-			value = clamp(value, 0, 1)
-			ratio = lerp(RATIO_SELECTOR_MIN, RATIO_SELECTOR_MAX, value)
+		onEntry = function()
+			local expectedRatio = determineRatio()
+			currentGearIndex = findNearestManualGear(expectedRatio)
+			updateGear()
+		end,
 
+		onTick = function()
+			local userInput = iN(4) -- Up/down
+
+			if math.abs(userInput) > 0.01 then
+				if not gearChanged then
+					if userInput > 0 then
+						if currentGearIndex < MANUAL_GEAR_COUNT then
+							currentGearIndex = currentGearIndex + 1
+							updateGear()
+						end
+					else
+						if currentGearIndex > 1 then
+							-- Prevent downshifting if new ratio would cause unsafe overrevving
+							local nextGearIndex = currentGearIndex - 1
+							local nextRatio = MANUAL_RATIOS["M" .. nextGearIndex] or 1.0
+
+							-- Calculate what the engine RPS would be after downshifting
+							local driveshaftRPS = iN(6)
+							local projectedEngineRPS = driveshaftRPS / nextRatio
+
+							-- Allow downshift only if it won't overrev the engine
+							if projectedEngineRPS <= MAX_RPS + DOWNSHIFT_OVERREV_MARGIN then
+								currentGearIndex = nextGearIndex
+								updateGear()
+							end
+						end
+					end
+
+					gearChanged = true
+				end
+			else
+				gearChanged = false
+			end
+
+			local ratio = smoothManualRatio(targetRatio)
 			setRatio(ratio)
+
 			autoClutch()
 			updateThrottle()
 			handleClutchEngage()
