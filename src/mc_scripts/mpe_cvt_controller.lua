@@ -458,11 +458,7 @@ StatePark = (function()
 	---@param v boolean
 	---@return nil
 	local function setPawl(v)
-		if v then
-			sN(3, 1)
-		else
-			sN(3, 0)
-		end
+		sB(2, v)
 	end
 
 	return {
